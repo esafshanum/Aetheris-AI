@@ -1,0 +1,31 @@
+# Virtual Environment
+venv/
+.venv/
+env/
+ENV/
+
+# Databases & Local Logs
+*.db
+chatbot.db
+*.log
+
+# User Uploaded Documents
+uploads/
+
+# FAISS Vector Index
+vectorstore/
+
+# Environment Variables & Secrets (Should not be checked into Git)
+.env
+
+# Python Caches
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+
+# IDE/Editor Configurations
+.vscode/
+.idea/
+.DS_Store

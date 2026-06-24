@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aetheris - Premium AI Chatbot Assistant</title>
+    
+    <!-- Global JavaScript Error Interceptor -->
+    <script>
+        window.onerror = function(message, source, lineno, colno, error) {
+            alert("Global Client Error:\n" + message + "\nSource: " + source + "\nLine: " + lineno + ":" + colno + "\nStack: " + (error ? error.stack : "N/A"));
+            return false;
+        };
+    </script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Highlight.js for Code Highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github-dark-dimmed.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    
+    <!-- Marked.js for Markdown Processing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+
+    <!-- ==================== AUTHENTICATION CONTAINER ==================== -->
+    <div id="auth-container" class="auth-wrapper">
+        <div class="auth-bg-gradient"></div>
+        <div class="auth-card glass-panel">
+            <div class="auth-header">
+                <div class="logo-box animate-pulse-glow">
+                    <i class="fa-solid fa-wand-magic-sparkles logo-icon"></i>
+                </div>
+                <h1 class="gradient-text text-center">Aetheris</h1>
+                <p id="auth-subtitle" class="text-center muted-text">Enter your credentials to begin your journey</p>
+            </div>
+            
+            <!-- Login Form -->
+            <form id="login-form" class="auth-form active">
+                <div class="input-group">
+                    <label for="login-username"><i class="fa-regular fa-user"></i> Username</label>
+                    <input type="text" id="login-username" required placeholder="e.g. alex_stone">
+                </div>
+                <div class="input-group">
+                    <label for="login-password"><i class="fa-regular fa-key"></i> Password</label>
+                    <input type="password" id="login-password" required placeholder="••••••••">
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">
+                    <span>Log In</span> <i class="fa-solid fa-right-to-bracket"></i>
+                </button>
+                <p class="auth-switch text-center">
+                    New to Aetheris? <a href="#" id="go-to-register">Create an account</a>
+                </p>
+            </form>
+
+            <!-- Register Form -->
+            <form id="register-form" class="auth-form">
+                <div class="input-group">
+                    <label for="register-username"><i class="fa-regular fa-user"></i> Choose Username</label>
+                    <input type="text" id="register-username" required placeholder="e.g. alex_stone">
+                </div>
+                <div class="input-group">
+                    <label for="register-password"><i class="fa-regular fa-key"></i> Create Password</label>
+                    <input type="password" id="register-password" required placeholder="Min 6 characters">
+                </div>
+                <button type="submit" class="btn btn-success btn-block">
+                    <span>Sign Up</span> <i class="fa-solid fa-user-plus"></i>
+                </button>
+                <p class="auth-switch text-center">
+                    Already have an account? <a href="#" id="go-to-login">Log in here</a>
+                </p>
+            </form>
+            
+            <!-- Auth Error Message -->
+            <div id="auth-error" class="error-banner hidden">
+                <i class="fa-solid fa-circle-exclamation"></i> <span id="auth-error-msg"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== MAIN CHAT CONSOLE ==================== -->
+    <div id="app-container" class="app-layout hidden">
+        
+        <!-- --- SIDEBAR: CHAT HISTORY & USER STATS --- -->
+        <aside id="sidebar" class="app-sidebar">
+            <div class="sidebar-header">
+                <div class="brand">
+                    <i class="fa-solid fa-wand-magic-sparkles brand-logo"></i>
+                    <span class="brand-name gradient-text">Aetheris</span>
+                </div>
+                <button id="close-sidebar-mobile-btn" class="mobile-only-btn" title="Close Sidebar">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- New Chat Button -->
+            <button id="new-chat-btn" class="btn btn-new-chat">
+                <i class="fa-solid fa-plus"></i> <span>New Conversation</span>
+            </button>
+
+            <!-- Search History -->
+            <div class="sidebar-search">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="text" id="search-history" placeholder="Search chats...">
+            </div>
+
+            <!-- Chat Sessions List -->
+            <div class="sidebar-sessions" id="sessions-list">
+                <!-- Dynamically rendered sessions -->
+            </div>
+
+            <!-- Sidebar User Profile Footer -->
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <div class="avatar user-avatar-small">
+                        <i class="fa-solid fa-user-ninja"></i>
+                    </div>
+                    <div class="user-info">
+                        <span id="current-username" class="username">Alex Stone</span>
+                        <span class="status-online"><span class="dot"></span> Online</span>
+                    </div>
+                </div>
+                <button id="logout-btn" class="btn-icon btn-logout" title="Sign Out">
+                    <i class="fa-solid fa-power-off"></i>
+                </button>
+            </div>
+        </aside>
+
+        <!-- --- MAIN WORKSPACE AREA --- -->
+        <main class="chat-viewport">
+            
+            <!-- Header bar -->
+            <header class="chat-header glass-panel">
+                <div class="header-left">
+                    <button id="sidebar-toggle-btn" class="btn-icon" title="Toggle Sidebar">
+                        <i class="fa-solid fa-bars-staggered"></i>
+                    </button>
+                    <div class="chat-meta">
+                        <h2 id="active-chat-title">New Conversation</h2>
+                        <span id="rag-status-indicator" class="rag-status badge hidden">
+                            <i class="fa-solid fa-folder-open"></i> <span>RAG Context Active</span>
+                        </span>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <span id="demo-badge" class="badge badge-warning hidden" title="Please set API key in settings.">
+                        <i class="fa-solid fa-triangle-exclamation"></i> Demo Mode
+                    </span>
+                    <button id="theme-toggle-btn" class="btn-icon" title="Toggle Light/Dark Theme">
+                        <i class="fa-solid fa-moon"></i>
+                    </button>
+                    <button id="settings-toggle-btn" class="btn-icon" title="Settings Panel">
+                        <i class="fa-solid fa-sliders"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Messages display board -->
+            <div class="messages-board" id="messages-container">
+                <!-- Messages populate here -->
+            </div>
+
+            <!-- Welcome/Landing State -->
+            <div id="welcome-screen" class="welcome-box">
+                <div class="logo-box animate-pulse-glow">
+                    <i class="fa-solid fa-wand-magic-sparkles welcome-logo"></i>
+                </div>
+                <h2>How can I help you today?</h2>
+                <p class="muted-text">Aetheris blends natural language processing, vector document analysis, and speech outputs into a unified workspace.</p>
+                
+                <div class="features-grid">
+                    <div class="feature-card glass-panel">
+                        <i class="fa-solid fa-file-pdf card-icon red"></i>
+                        <h3>Deep Document RAG</h3>
+                        <p>Upload PDFs, spreadsheets, Word documents, or text files to chat and query their data directly.</p>
+                    </div>
+                    <div class="feature-card glass-panel">
+                        <i class="fa-solid fa-microphone card-icon blue"></i>
+                        <h3>Voice Interaction</h3>
+                        <p>Speak naturally using real-time speech-to-text. Listen to responses with adjustable synthesis voices.</p>
+                    </div>
+                    <div class="feature-card glass-panel">
+                        <i class="fa-solid fa-bolt card-icon gold"></i>
+                        <h3>Streaming Execution</h3>
+                        <p>Watch solutions compile, explain code, and layout tables in real-time as they stream.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RAG Upload Banner & Drawer -->
+            <div id="upload-status-bar" class="upload-status-bar glass-panel hidden">
+                <div class="bar-left">
+                    <i class="fa-solid fa-paperclip"></i>
+                    <span id="upload-status-text">Attached files:</span>
+                    <div class="attached-files-list" id="attached-files-container">
+                        <!-- Dynamic file pills -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- User input controls tray -->
+            <div class="input-panel">
+                <div class="input-container glass-panel">
+                    
+                    <!-- File upload trigger -->
+                    <button id="attach-file-btn" class="btn-icon input-action" title="Attach Documents">
+                        <i class="fa-solid fa-paperclip"></i>
+                    </button>
+                    <!-- Invisible file input -->
+                    <input type="file" id="file-uploader" multiple class="hidden" accept=".pdf,.docx,.txt,.csv,.xlsx,.xls,.md">
+
+                    <!-- Text area -->
+                    <textarea id="chat-textarea" placeholder="Send a message, ask about files..." rows="1"></textarea>
+
+                    <!-- Speech microphone trigger -->
+                    <button id="mic-btn" class="btn-icon input-action" title="Voice Input">
+                        <i class="fa-solid fa-microphone"></i>
+                    </button>
+
+                    <!-- Send / Cancel button -->
+                    <button id="send-btn" class="btn-send" title="Send Message">
+                        <i class="fa-solid fa-arrow-up"></i>
+                    </button>
+                    <button id="stop-btn" class="btn-send btn-stop hidden" title="Stop Generation">
+                        <i class="fa-solid fa-stop"></i>
+                    </button>
+                </div>
+            </div>
+        </main>
+
+        <!-- ==================== SETTINGS OVERLAY MODAL ==================== -->
+        <div id="settings-modal" class="modal-overlay hidden">
+            <div class="modal-card glass-panel animate-zoom-in">
+                <div class="modal-header">
+                    <h3><i class="fa-solid fa-sliders"></i> Configuration Panel</h3>
+                    <button id="close-settings-btn" class="btn-close-modal"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <div class="modal-body">
+                    
+                    <!-- Section: API Credentials -->
+                    <div class="setting-section">
+                        <h4><i class="fa-solid fa-key"></i> Authentication Credentials</h4>
+                        <div class="input-group">
+                            <label for="settings-api-key">OpenAI / Groq API Key (Client override)</label>
+                            <input type="password" id="settings-api-key" placeholder="sk-proj-... or gsk_...">
+                            <p class="setting-description">Overrides server credentials. Saved locally in your browser session.</p>
+                        </div>
+                    </div>
+
+                    <!-- Section: LLM Tuning -->
+                    <div class="setting-section">
+                        <h4><i class="fa-solid fa-sliders"></i> LLM Configuration</h4>
+                        
+                        <div class="setting-row">
+                            <div class="setting-item">
+                                <label for="settings-model">Completion Model</label>
+                                <select id="settings-model">
+                                    <option value="gpt-4o" selected>GPT-4o (Recommended)</option>
+                                    <option value="gpt-4-turbo">GPT-4 Turbo</option>
+                                    <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+                                    <option value="llama-3.3-70b-versatile">Llama 3.3 70B (Groq)</option>
+                                    <option value="llama3-8b-8192">Llama 3 8B (Groq)</option>
+                                    <option value="mixtral-8x7b-32768">Mixtral 8x7B (Groq)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="setting-row">
+                            <div class="setting-item slider-item">
+                                <div class="slider-header">
+                                    <label for="settings-temp">Temperature</label>
+                                    <span id="temp-val">0.7</span>
+                                </div>
+                                <input type="range" id="settings-temp" min="0" max="1" step="0.1" value="0.7">
+                            </div>
+                            
+                            <div class="setting-item slider-item">
+                                <div class="slider-header">
+                                    <label for="settings-max-tokens">Max Output Length</label>
+                                    <span id="tokens-val">1000</span>
+                                </div>
+                                <input type="range" id="settings-max-tokens" min="200" max="4000" step="100" value="1000">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section: Speech Synthesis Settings -->
+                    <div class="setting-section">
+                        <h4><i class="fa-solid fa-volume-high"></i> Voice Assistant Settings</h4>
+                        
+                        <div class="setting-row">
+                            <div class="setting-item">
+                                <label for="settings-tts-engine">TTS Engine</label>
+                                <select id="settings-tts-engine">
+                                    <option value="system" selected>System Speech API (Free Offline)</option>
+                                    <option value="sarvam">Sarvam AI (Premium Indian Voices)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- System TTS options -->
+                        <div id="system-tts-options" class="setting-row">
+                            <div class="setting-item">
+                                <label for="settings-voice-select">Synthesis Voice</label>
+                                <select id="settings-voice-select">
+                                    <!-- Populated dynamically via JS -->
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Sarvam AI options (Hidden by default) -->
+                        <div id="sarvam-tts-options" class="hidden">
+                            <div class="setting-row" style="margin-bottom: 12px;">
+                                <div class="setting-item">
+                                    <label for="settings-sarvam-api-key">Sarvam AI API Key (Client override)</label>
+                                    <input type="password" id="settings-sarvam-api-key" placeholder="Enter Sarvam AI API Key (starts with sarvam)..." style="width: 100%; border-radius: var(--radius-sm); padding: 8px; font-family: var(--font-primary); background: var(--bg-primary); border: 1px solid var(--glass-border); color: var(--text-primary);">
+                                </div>
+                            </div>
+                            <div class="setting-row">
+                                <div class="setting-item">
+                                    <label for="settings-sarvam-lang">Indian Language</label>
+                                    <select id="settings-sarvam-lang">
+                                        <option value="hi-IN" selected>Hindi (हिन्दी)</option>
+                                        <option value="mr-IN">Marathi (मराठी)</option>
+                                        <option value="en-IN">English (Indian Accent)</option>
+                                        <option value="te-IN">Telugu (తెలుగు)</option>
+                                        <option value="ta-IN">Tamil (தமிழ்)</option>
+                                        <option value="ml-IN">Malayalam (മലയാളം)</option>
+                                        <option value="kn-IN">Kannada (ಕന്നਡ)</option>
+                                        <option value="bn-IN">Bengali (বাংলা)</option>
+                                        <option value="gu-IN">Gujarati (ગુજરાતી)</option>
+                                        <option value="pa-IN">Punjabi (ਪੰਜਾਬੀ)</option>
+                                        <option value="or-IN">Odia (ଓଡ଼ିଆ)</option>
+                                    </select>
+                                </div>
+                                <div class="setting-item">
+                                    <label for="settings-sarvam-gender">Voice Gender</label>
+                                    <select id="settings-sarvam-gender">
+                                        <option value="female" selected>Female (Meera)</option>
+                                        <option value="male">Male (Arjun)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="setting-row">
+                            <div class="setting-item slider-item">
+                                <div class="slider-header">
+                                    <label for="settings-speech-rate">Speed (Rate)</label>
+                                    <span id="rate-val">1.0x</span>
+                                </div>
+                                <input type="range" id="settings-speech-rate" min="0.5" max="2" step="0.1" value="1">
+                            </div>
+                            
+                            <div class="setting-item toggle-item">
+                                <label for="settings-auto-read">Auto-Read AI Responses</label>
+                                <div class="toggle-switch">
+                                    <input type="checkbox" id="settings-auto-read">
+                                    <label for="settings-auto-read" class="toggle-slider"></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button id="save-settings-btn" class="btn btn-primary">Save Settings</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ==================== CONFIRMATION MODAL ==================== -->
+        <div id="confirm-modal" class="modal-overlay hidden">
+            <div class="modal-card glass-panel animate-zoom-in" style="max-width: 480px;">
+                <div class="modal-header">
+                    <h3 style="color: var(--error-color);"><i class="fa-solid fa-circle-exclamation"></i> Aetheris says</h3>
+                    <button id="confirm-close-btn" class="btn-close-modal"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <div class="modal-body" style="padding: 20px 25px 10px 25px; gap: 15px; font-size: 1rem; line-height: 1.5; color: var(--text-primary);">
+                    <p id="confirm-message">Are you sure you want to delete this chat session? All transcripts and file indexes will be lost permanently.</p>
+                </div>
+                <div class="modal-footer" style="gap: 12px; padding: 15px 25px 20px 25px; border-top: none;">
+                    <button id="confirm-cancel-btn" class="btn btn-secondary">Cancel</button>
+                    <button id="confirm-ok-btn" class="btn btn-danger">Delete</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Script triggers -->
+    <script src="/static/js/auth.js"></script>
+    <script src="/static/js/voice.js"></script>
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

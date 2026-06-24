@@ -1,0 +1,34 @@
+# Task List - AI Chatbot Assistant Implementation
+
+- [x] Core Project Setup
+  - [x] Initialize `requirements.txt`
+  - [x] Create `.env` configuration file
+  - [x] Create folders (`backend/app`, `frontend/static/css`, `frontend/static/js`, `frontend/templates`, `uploads`, `vectorstore`)
+- [x] Backend Database & Authentication
+  - [x] Define SQLAlchemy database models (`backend/app/models.py`)
+  - [x] Set up database session & engine (`backend/app/database.py`)
+  - [x] Implement user auth logic & JWT processing (`backend/app/auth.py`)
+  - [x] Define API schemas (`backend/app/schemas.py`)
+- [x] Backend Services
+  - [x] Implement LLM streaming service with OpenAI client & demo mode (`backend/app/services/llm_service.py`)
+  - [x] Create RAG processing and vector indexing service (`backend/app/services/rag_service.py`)
+  - [x] Set up file validation, rate limiting & input sanitization (`backend/app/utils/security.py`)
+  - [x] Add export helpers (PDF and TXT formats) (`backend/app/utils/helpers.py`)
+- [x] Backend Routing & Server Root
+  - [x] Write auth routes (`backend/app/routes/auth_routes.py`)
+  - [x] Write chat management and message routes (`backend/app/routes/chat_routes.py`)
+  - [x] Write document upload and parsing routes (`backend/app/routes/document_routes.py`)
+  - [x] Set up main FastAPI entry point and static file serving (`backend/app/main.py`)
+- [x] Frontend Development (SPA UI)
+  - [x] Create HTML structure with combined login/register/chat viewport (`frontend/templates/index.html`)
+  - [x] Implement responsive modern glassmorphic design and dark/light modes (`frontend/static/css/styles.css`)
+  - [x] Code authentication state management (`frontend/static/js/auth.js`)
+  - [x] Integrate Web Speech API for voice interactions (`frontend/static/js/voice.js`)
+  - [x] Connect chat streaming, multi-turn dialogue, RAG uploads, settings panel & management UI (`frontend/static/js/app.js`)
+- [x] Containerization & Documentation
+  - [x] Build `Dockerfile`
+  - [x] Configure `docker-compose.yml`
+  - [x] Write deployment guide in `README.md`
+- [x] Verification & Walkthrough
+  - [x] Verify setup locally
+  - [x] Document final deliverables in `walkthrough.md`

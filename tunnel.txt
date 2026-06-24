@@ -1,0 +1,5 @@
+Starting Pinggy SSH tunnel...
+Pseudo-terminal will not be allocated because stdin is not a terminal.
+ssh: Could not resolve hostname pinggy.in: No such host is known. 
+
+Finished monitoring loop.
