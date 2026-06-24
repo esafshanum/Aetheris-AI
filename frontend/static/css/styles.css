@@ -1272,14 +1272,24 @@ a:hover {
 
 /* ==================== RESPONSIVE LAYOUTS ==================== */
 @media (max-width: 868px) {
+    /* Lock layout container heights to mobile screen height */
+    body, .app-layout {
+        height: 100vh;
+        height: 100dvh;
+        overflow: hidden;
+    }
+
     /* Collapse sidebar offscreen */
     .app-sidebar {
-        position: absolute;
+        position: fixed;
         left: 0;
         top: 0;
         height: 100%;
+        width: 290px;
+        max-width: 85%;
         transform: translateX(-100%);
         box-shadow: 5px 0 25px rgba(0, 0, 0, 0.4);
+        z-index: 1000;
     }
     .app-sidebar.active {
         transform: translateX(0);
@@ -1296,7 +1306,99 @@ a:hover {
         cursor: pointer;
     }
 
+    /* Header scaling adjustments */
+    .chat-header {
+        padding: 0 15px;
+        height: var(--header-height);
+    }
+    .chat-meta h2 {
+        max-width: 140px;
+        font-size: 1rem;
+    }
+    .rag-status span {
+        display: none; /* Hide 'RAG Context Active' text to make room */
+    }
+    .rag-status {
+        padding: 4px 6px;
+    }
+
+    /* Compact board messaging layouts */
+    .messages-board {
+        padding: 15px 12px;
+        gap: 15px;
+    }
+    .message-wrapper {
+        gap: 10px;
+    }
+    .msg-avatar {
+        width: 32px;
+        height: 32px;
+        font-size: 0.9rem;
+    }
+    .msg-body {
+        max-width: 88%;
+    }
+    .msg-bubble {
+        padding: 10px 14px;
+        font-size: 0.92rem;
+    }
+
+    /* Input controls scaling to prevent keybard overlays & scrolling */
+    .input-panel {
+        padding: 0 12px 12px 12px;
+    }
+    .input-container {
+        padding: 6px 10px;
+        border-radius: var(--radius-lg);
+        gap: 6px;
+    }
+    .input-container textarea {
+        font-size: 0.92rem;
+        padding: 6px 4px;
+        max-height: 100px;
+    }
+    .btn-send {
+        width: 34px;
+        height: 34px;
+    }
+
+    /* File uploading status bar */
+    .upload-status-bar {
+        width: calc(100% - 24px);
+        padding: 6px 12px;
+        margin-bottom: 6px;
+    }
+    .attached-files-list {
+        gap: 4px;
+    }
+
+    /* Welcome Landing page mobile grids */
+    .welcome-box {
+        padding: 10px;
+        gap: 12px;
+    }
+    .welcome-box h2 {
+        font-size: 1.4rem;
+    }
+    .welcome-box p {
+        font-size: 0.82rem;
+    }
     .features-grid {
         grid-template-columns: 1fr;
+        gap: 10px;
+        margin-top: 15px;
+    }
+    .feature-card {
+        padding: 15px 12px;
+    }
+
+    /* Overlays modals scaling */
+    .modal-card {
+        max-height: 85vh;
+        max-height: 85dvh;
+    }
+    .modal-body {
+        padding: 15px;
+        gap: 15px;
     }
 }
