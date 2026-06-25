@@ -105,6 +105,9 @@ const Voice = {
                 this.synthesis.onvoiceschanged = () => this.loadVoices();
             }
         }
+
+        // Sync voice toggle button UI
+        this.updateVoiceToggleUI();
     },
 
     toggleEngineOptions(engine) {
@@ -116,6 +119,21 @@ const Voice = {
         } else {
             systemOptions.classList.remove("hidden");
             sarvamOptions.classList.add("hidden");
+        }
+    },
+
+    updateVoiceToggleUI() {
+        const voiceToggle = document.getElementById("voice-speak-toggle");
+        if (voiceToggle) {
+            if (this.autoRead) {
+                voiceToggle.classList.add("active");
+                voiceToggle.innerHTML = '<i class="fa-solid fa-volume-high"></i>';
+                voiceToggle.title = "Mute Voice Responses";
+            } else {
+                voiceToggle.classList.remove("active");
+                voiceToggle.innerHTML = '<i class="fa-solid fa-volume-xmark"></i>';
+                voiceToggle.title = "Unmute Voice Responses";
+            }
         }
     },
 
@@ -230,6 +248,24 @@ const Voice = {
             autoReadCheck.addEventListener("change", (e) => {
                 this.autoRead = e.target.checked;
                 localStorage.setItem("aetheris_auto_read", this.autoRead);
+                this.updateVoiceToggleUI();
+            });
+        }
+
+        // Voice speak shortcut button toggle
+        const voiceToggle = document.getElementById("voice-speak-toggle");
+        if (voiceToggle) {
+            voiceToggle.addEventListener("click", (e) => {
+                e.preventDefault();
+                this.autoRead = !this.autoRead;
+                localStorage.setItem("aetheris_auto_read", this.autoRead);
+                
+                // Sync settings checkbox
+                if (autoReadCheck) {
+                    autoReadCheck.checked = this.autoRead;
+                }
+                
+                this.updateVoiceToggleUI();
             });
         }
     },

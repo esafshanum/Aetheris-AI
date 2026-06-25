@@ -49,11 +49,11 @@
             <form id="login-form" class="auth-form active">
                 <div class="input-group">
                     <label for="login-username"><i class="fa-regular fa-user"></i> Username</label>
-                    <input type="text" id="login-username" required placeholder="e.g. alex_stone">
+                    <input type="text" id="login-username" name="username" autocomplete="username" required placeholder="e.g. alex_stone">
                 </div>
                 <div class="input-group">
                     <label for="login-password"><i class="fa-regular fa-key"></i> Password</label>
-                    <input type="password" id="login-password" required placeholder="••••••••">
+                    <input type="password" id="login-password" name="password" autocomplete="current-password" required placeholder="••••••••">
                 </div>
                 <button type="submit" class="btn btn-primary btn-block">
                     <span>Log In</span> <i class="fa-solid fa-right-to-bracket"></i>
@@ -67,11 +67,11 @@
             <form id="register-form" class="auth-form">
                 <div class="input-group">
                     <label for="register-username"><i class="fa-regular fa-user"></i> Choose Username</label>
-                    <input type="text" id="register-username" required placeholder="e.g. alex_stone">
+                    <input type="text" id="register-username" name="username" autocomplete="username" required placeholder="e.g. alex_stone">
                 </div>
                 <div class="input-group">
                     <label for="register-password"><i class="fa-regular fa-key"></i> Create Password</label>
-                    <input type="password" id="register-password" required placeholder="Min 6 characters">
+                    <input type="password" id="register-password" name="password" autocomplete="new-password" required placeholder="Min 6 characters">
                 </div>
                 <button type="submit" class="btn btn-success btn-block">
                     <span>Sign Up</span> <i class="fa-solid fa-user-plus"></i>
@@ -221,6 +221,11 @@
 
                     <!-- Text area -->
                     <textarea id="chat-textarea" placeholder="Send a message, ask about files..." rows="1"></textarea>
+
+                    <!-- Voice auto-read toggle -->
+                    <button id="voice-speak-toggle" class="btn-icon input-action" title="Toggle Auto-Read responses">
+                        <i class="fa-solid fa-volume-xmark"></i>
+                    </button>
 
                     <!-- Speech microphone trigger -->
                     <button id="mic-btn" class="btn-icon input-action" title="Voice Input">
