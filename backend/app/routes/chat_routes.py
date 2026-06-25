@@ -197,10 +197,11 @@ async def send_message(
         .all()
     history_messages.reverse() # Restore chronological order
 
-    # 4. Construct System Instructions & Prompt Array
     system_instruction = (
         "You are a helpful, professional, and friendly AI chatbot assistant.\n"
         "Format your responses nicely in Markdown. Use lists, tables, headers, and code highlighting where appropriate.\n"
+        "If the user requests images or visual descriptions, you can display high-quality public images directly inline using standard Markdown image syntax: `![alt text](URL)`. "
+        "Use premium, copyright-free image links from sources like Unsplash (e.g. `https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=600` for landscapes, `https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=600` for tech/space, etc.) to illustrate your answers beautifully.\n"
     )
     
     if context_str:
@@ -319,5 +320,14 @@ def export_chat(
             headers={"Content-Disposition": f"attachment; filename={filename}"}
         )
         
+    elif format_type == "docx":
+        docx_bytes = ExportHelpers.export_to_docx(session.title, messages)
+        filename = f"chat_export_{session_id}.docx"
+        return Response(
+            content=docx_bytes,
+            media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            headers={"Content-Disposition": f"attachment; filename={filename}"}
+        )
+        
     else:
-        raise HTTPException(status_code=400, detail="Invalid export format. Choose 'txt' or 'pdf'.")
+        raise HTTPException(status_code=400, detail="Invalid export format. Choose 'txt', 'pdf' or 'docx'.")

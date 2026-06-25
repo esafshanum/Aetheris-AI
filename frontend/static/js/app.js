@@ -493,6 +493,7 @@ const App = {
         const dropdownHtml = `
             <div id="export-dropdown-${sessionId}" class="glass-panel" style="position:absolute; right:10px; background:var(--bg-secondary); border:1px solid var(--glass-border); padding:8px; border-radius:var(--radius-sm); z-index:1000; box-shadow:0 4px 12px rgba(0,0,0,0.25);">
                 <button class="btn-session-action" onclick="App.executeExport('${sessionId}', 'txt')" style="display:flex; width:100%; align-items:center; gap:8px; padding:6px; font-size:0.8rem; color:var(--text-primary); text-align:left;"><i class="fa-regular fa-file-lines"></i> Export as Text (.txt)</button>
+                <button class="btn-session-action" onclick="App.executeExport('${sessionId}', 'docx')" style="display:flex; width:100%; align-items:center; gap:8px; padding:6px; font-size:0.8rem; color:var(--text-primary); text-align:left; margin-top:4px;"><i class="fa-regular fa-file-word"></i> Export as Word (.docx)</button>
                 <button class="btn-session-action" onclick="App.executeExport('${sessionId}', 'pdf')" style="display:flex; width:100%; align-items:center; gap:8px; padding:6px; font-size:0.8rem; color:var(--text-primary); text-align:left; margin-top:4px;"><i class="fa-regular fa-file-pdf"></i> Export as PDF (.pdf)</button>
             </div>
         `;

@@ -74,3 +74,58 @@ class ExportHelpers:
             pdf.ln(4)
             
         return bytes(pdf.output())
+
+    @staticmethod
+    def export_to_docx(chat_title: str, messages: List[Any]) -> bytes:
+        import io
+        from docx import Document as DocxDocument
+        from docx.shared import Pt, RGBColor
+        
+        doc = DocxDocument()
+        
+        # Title Header
+        title_p = doc.add_paragraph()
+        title_run = title_p.add_run(f"AI Chatbot Assistant - Chat History\nTopic: {chat_title}")
+        title_run.font.name = 'Arial'
+        title_run.font.size = Pt(14)
+        title_run.bold = True
+        
+        # Subtitle
+        timestamp = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC")
+        subtitle_p = doc.add_paragraph()
+        subtitle_run = subtitle_p.add_run(f"Exported At: {timestamp}\n")
+        subtitle_run.font.name = 'Arial'
+        subtitle_run.font.size = Pt(10)
+        subtitle_run.italic = True
+        subtitle_run.font.color.rgb = RGBColor(128, 128, 128)
+        
+        doc.add_paragraph("=" * 60)
+        
+        for msg in messages:
+            sender_label = "User" if msg.sender == "user" else "AI Assistant"
+            msg_time = msg.timestamp.strftime("%Y-%m-%d %H:%M")
+            
+            # Speaker paragraph
+            speaker_p = doc.add_paragraph()
+            speaker_run = speaker_p.add_run(f"{sender_label} ({msg_time})")
+            speaker_run.font.name = 'Arial'
+            speaker_run.font.size = Pt(11)
+            speaker_run.bold = True
+            
+            if msg.sender == "user":
+                speaker_run.font.color.rgb = RGBColor(26, 115, 232)
+            else:
+                speaker_run.font.color.rgb = RGBColor(16, 124, 65)
+                
+            # Content paragraph
+            content_p = doc.add_paragraph()
+            content_run = content_p.add_run(msg.content)
+            content_run.font.name = 'Arial'
+            content_run.font.size = Pt(10.5)
+            
+            doc.add_paragraph("-" * 50)
+            
+        file_stream = io.BytesIO()
+        doc.save(file_stream)
+        file_stream.seek(0)
+        return file_stream.getvalue()

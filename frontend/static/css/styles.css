@@ -659,6 +659,7 @@ a:hover {
     display: flex;
     flex-direction: column;
     height: 100%;
+    min-height: 0;
     background-color: var(--bg-primary);
     position: relative;
 }
@@ -724,6 +725,7 @@ a:hover {
 .messages-board {
     flex: 1;
     overflow-y: auto;
+    min-height: 0;
     padding: 30px;
     display: flex;
     flex-direction: column;
@@ -849,6 +851,16 @@ a:hover {
     border: 1px solid var(--chat-bubble-ai-border);
     color: var(--text-primary);
     border-bottom-left-radius: 4px;
+}
+
+/* Responsive image rendering inside messages */
+.msg-bubble img {
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--radius-md);
+    margin-top: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--glass-border);
 }
 
 /* Actions below bubbles */
@@ -1273,9 +1285,8 @@ a:hover {
 /* ==================== RESPONSIVE LAYOUTS ==================== */
 @media (max-width: 868px) {
     /* Lock layout container heights to mobile screen height */
-    body, .app-layout {
-        height: 100vh;
-        height: 100dvh;
+    html, body, .app-layout {
+        height: 100%;
         overflow: hidden;
     }
 
@@ -1400,5 +1411,11 @@ a:hover {
     .modal-body {
         padding: 15px;
         gap: 15px;
+    }
+
+    /* Auth card mobile sizing */
+    .auth-card {
+        padding: 24px 20px;
+        margin: 10px;
     }
 }
