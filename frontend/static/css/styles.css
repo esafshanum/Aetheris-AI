@@ -34,16 +34,17 @@
     --text-secondary: #94a3b8;
     --text-muted: #64748b;
     
-    --accent-primary: #ff758f; /* Bubble Pink */
-    --accent-hover: #ff4d6d;
-    --accent-glow: rgba(255, 117, 143, 0.35);
-    --accent-light: rgba(255, 117, 143, 0.1);
+    --accent-primary: #ffbde6; /* Baby/Bubble Pink */
+    --accent-hover: #ffa6d2;
+    --accent-glow: rgba(255, 189, 230, 0.35);
+    --accent-light: rgba(255, 189, 230, 0.1);
     
     --glass-bg: rgba(15, 19, 26, 0.75);
     --glass-border: rgba(255, 255, 255, 0.05);
     --glass-shadow: rgba(0, 0, 0, 0.4);
     
-    --chat-bubble-user: #ff758f;
+    --chat-bubble-user: #ffbde6;
+    --chat-bubble-user-text: #080b11;
     --chat-bubble-ai: rgba(23, 29, 38, 0.85);
     --chat-bubble-ai-border: rgba(255, 255, 255, 0.03);
     
@@ -66,16 +67,17 @@
     --text-secondary: #475569;
     --text-muted: #64748b;
     
-    --accent-primary: #ff4d6d;
-    --accent-hover: #c9184a;
-    --accent-glow: rgba(255, 77, 109, 0.2);
-    --accent-light: rgba(255, 77, 109, 0.08);
+    --accent-primary: #ffa6d2;
+    --accent-hover: #ff758f;
+    --accent-glow: rgba(255, 166, 210, 0.2);
+    --accent-light: rgba(255, 166, 210, 0.08);
     
     --glass-bg: rgba(255, 255, 255, 0.8);
     --glass-border: rgba(15, 23, 42, 0.08);
     --glass-shadow: rgba(15, 23, 42, 0.05);
     
-    --chat-bubble-user: #ff4d6d;
+    --chat-bubble-user: #ffa6d2;
+    --chat-bubble-user-text: #080b11;
     --chat-bubble-ai: #f1f5f9;
     --chat-bubble-ai-border: rgba(15, 23, 42, 0.04);
     
@@ -154,7 +156,7 @@ a:hover {
 }
 
 .gradient-text {
-    background: linear-gradient(135deg, #ffb3c1 0%, #ff758f 50%, #c9184a 100%);
+    background: linear-gradient(135deg, #ffc0df 0%, #ffbde6 50%, #ffa6d2 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -311,7 +313,7 @@ a:hover {
     position: absolute;
     width: 100%;
     height: 100%;
-    background: radial-gradient(circle at 10% 20%, rgba(255, 117, 143, 0.15) 0%, transparent 40%),
+    background: radial-gradient(circle at 10% 20%, rgba(255, 189, 230, 0.15) 0%, transparent 40%),
                 radial-gradient(circle at 90% 80%, rgba(16, 185, 129, 0.08) 0%, transparent 40%);
     pointer-events: none;
 }
@@ -848,7 +850,7 @@ a:hover {
 }
 .message-wrapper.user .msg-bubble {
     background-color: var(--chat-bubble-user);
-    color: #ffffff;
+    color: var(--chat-bubble-user-text);
     border-bottom-right-radius: 4px;
 }
 .message-wrapper.ai .msg-bubble {
