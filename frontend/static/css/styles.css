@@ -296,12 +296,15 @@ a:hover {
     left: 0;
     width: 100vw;
     height: 100vh;
+    height: calc(var(--vh, 1vh) * 100);
+    height: 100dvh;
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 1000;
     padding: 20px;
     background-color: var(--bg-primary);
+    overflow-y: auto;
 }
 
 .auth-bg-gradient {
@@ -407,6 +410,8 @@ a:hover {
     display: flex;
     width: 100vw;
     height: 100vh;
+    height: calc(var(--vh, 1vh) * 100);
+    height: 100dvh;
     overflow: hidden;
 }
 
@@ -1293,7 +1298,9 @@ a:hover {
 @media (max-width: 868px) {
     /* Lock layout container heights to mobile screen height */
     html, body, .app-layout {
-        height: 100%;
+        height: 100vh;
+        height: calc(var(--vh, 1vh) * 100);
+        height: 100dvh;
         overflow: hidden;
     }
 
@@ -1303,6 +1310,8 @@ a:hover {
         left: 0;
         top: 0;
         height: 100%;
+        height: calc(var(--vh, 1vh) * 100);
+        height: 100dvh;
         width: 290px;
         max-width: 85%;
         transform: translateX(-100%);
@@ -1361,14 +1370,21 @@ a:hover {
         font-size: 0.92rem;
     }
 
+    /* Shrink action buttons to give textarea more horizontal space */
+    .btn-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: var(--radius-sm);
+    }
+
     /* Input controls scaling to prevent keybard overlays & scrolling */
     .input-panel {
         padding: 0 12px 12px 12px;
     }
     .input-container {
-        padding: 6px 10px;
-        border-radius: var(--radius-lg);
-        gap: 6px;
+        padding: 6px 8px;
+        border-radius: var(--radius-md);
+        gap: 4px;
     }
     .input-container textarea {
         font-size: 0.92rem;

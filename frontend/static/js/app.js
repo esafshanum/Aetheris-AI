@@ -18,6 +18,7 @@ const App = {
     },
 
     init() {
+        this.initMobileHeight();
         this.loadSettings();
         this.bindEvents();
         this.initTheme();
@@ -25,6 +26,16 @@ const App = {
         // Listen for authentication changes
         window.addEventListener("aetheris_auth_success", () => this.onAuthSuccess());
         window.addEventListener("aetheris_logout", () => this.onLogout());
+    },
+
+    initMobileHeight() {
+        const setVh = () => {
+            const vh = window.innerHeight * 0.01;
+            document.documentElement.style.setProperty('--vh', `${vh}px`);
+        };
+        window.addEventListener('resize', setVh);
+        window.addEventListener('orientationchange', setVh);
+        setVh();
     },
 
     // --- SETUP & UTILS ---
@@ -199,6 +210,18 @@ const App = {
         textarea.addEventListener("input", function() {
             this.style.height = "auto";
             this.style.height = (this.scrollHeight - 4) + "px";
+        });
+
+        // Reset scroll when input loses focus (fixes keyboard layout shifts in iOS Safari)
+        textarea.addEventListener("blur", () => {
+            window.scrollTo(0, 0);
+        });
+
+        // Dismiss mobile sidebar when tapping on messages area
+        document.getElementById("messages-container").addEventListener("click", () => {
+            if (window.innerWidth <= 868) {
+                document.getElementById("sidebar").classList.remove("active");
+            }
         });
 
         // Press Enter to submit prompt
