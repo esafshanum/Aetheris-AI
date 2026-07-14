@@ -1298,12 +1298,37 @@ a:hover {
 
 /* ==================== RESPONSIVE LAYOUTS ==================== */
 @media (max-width: 868px) {
-    /* Lock layout container heights to mobile screen height */
-    html, body, .app-layout {
-        height: 100vh;
+    /* Lock layout container heights and prevent browser viewport shifts */
+    html, body {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        height: 100%;
+        height: 100dvh;
+        overflow: hidden;
+    }
+
+    .app-layout {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        height: 100%;
         height: calc(var(--vh, 1vh) * 100);
         height: 100dvh;
         overflow: hidden;
+    }
+
+    /* Prevent auto-zoom on input focus in iOS Safari */
+    .input-group input, 
+    .input-group select, 
+    .input-container textarea {
+        font-size: 16px !important;
     }
 
     /* Collapse sidebar offscreen */
@@ -1389,7 +1414,7 @@ a:hover {
         gap: 4px;
     }
     .input-container textarea {
-        font-size: 0.92rem;
+        font-size: 16px;
         padding: 6px 4px;
         max-height: 100px;
     }
@@ -1410,6 +1435,7 @@ a:hover {
 
     /* Welcome Landing page mobile grids */
     .welcome-box {
+        margin: 10px auto;
         padding: 10px;
         gap: 12px;
     }
