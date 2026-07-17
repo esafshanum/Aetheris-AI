@@ -16,6 +16,28 @@ except Exception as e:
     print(f"CRITICAL: Database initialization failed on startup: {str(e)}")
     print("Continuing server startup in degraded/offline database mode.")
 
+# Run database migrations for is_admin column (adds column if missing from existing deploys)
+try:
+    from backend.app.database import SessionLocal
+    from sqlalchemy import text
+    db_session = SessionLocal()
+    try:
+        # Check if is_admin column exists
+        db_session.execute(text("SELECT is_admin FROM users LIMIT 1"))
+    except Exception:
+        db_session.rollback()
+        print("Migration: 'is_admin' column is missing in 'users' table. Altering table...")
+        dialect = engine.url.drivername
+        if "sqlite" in dialect:
+            db_session.execute(text("ALTER TABLE users ADD COLUMN is_admin BOOLEAN DEFAULT 0"))
+        else:
+            db_session.execute(text("ALTER TABLE users ADD COLUMN is_admin BOOLEAN DEFAULT FALSE"))
+        db_session.commit()
+        print("Migration completed: 'is_admin' column added to 'users' table.")
+    db_session.close()
+except Exception as mig_err:
+    print(f"Error executing database migrations: {str(mig_err)}")
+
 # Seed default admin user
 try:
     from backend.app.database import SessionLocal
