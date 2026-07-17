@@ -1362,7 +1362,7 @@ a:hover {
 
     /* Collapse sidebar offscreen */
     .app-sidebar {
-        position: fixed;
+        position: absolute !important;
         left: 0;
         top: 0;
         height: 100%;
@@ -1373,11 +1373,16 @@ a:hover {
         transform: translateX(-100%);
         box-shadow: 5px 0 25px rgba(0, 0, 0, 0.4);
         z-index: 1000;
-        margin-right: -290px; /* Offset width to prevent browser flex shifting */
         transition: transform var(--transition-normal);
     }
     .app-sidebar.active {
         transform: translateX(0);
+    }
+
+    .chat-viewport {
+        width: 100vw !important;
+        max-width: 100% !important;
+        flex: 1 1 auto !important;
     }
 
     .mobile-only-btn {
