@@ -22,10 +22,10 @@ try:
     from backend.app.models import User
     from backend.app.auth import get_password_hash
     db_session = SessionLocal()
-    admin_username = os.environ.get("ADMIN_USERNAME", "aetheris_admin")
+    admin_username = os.environ.get("ADMIN_USERNAME", "Shanum")
     admin_exists = db_session.query(User).filter(User.username == admin_username).first()
     if not admin_exists:
-        admin_password = os.environ.get("ADMIN_PASSWORD", "adminPassword123")
+        admin_password = os.environ.get("ADMIN_PASSWORD", "Shanum@Aetheris#2026")
         new_admin = User(
             username=admin_username,
             hashed_password=get_password_hash(admin_password),
@@ -34,6 +34,11 @@ try:
         db_session.add(new_admin)
         db_session.commit()
         print(f"Stealth admin user '{admin_username}' seeded successfully.")
+    else:
+        if not admin_exists.is_admin:
+            admin_exists.is_admin = True
+            db_session.commit()
+            print(f"Existing user '{admin_username}' promoted to administrator.")
     db_session.close()
 except Exception as seed_err:
     print(f"Error seeding default admin account: {str(seed_err)}")
