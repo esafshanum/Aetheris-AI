@@ -12,6 +12,19 @@ const Auth = {
     },
 
     bindEvents() {
+        // Password toggles (Eye Icon)
+        document.querySelectorAll(".btn-toggle-password").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const input = btn.previousElementSibling;
+                if (input.type === "password") {
+                    input.type = "text";
+                    btn.innerHTML = '<i class="fa-regular fa-eye"></i>';
+                } else {
+                    input.type = "password";
+                    btn.innerHTML = '<i class="fa-regular fa-eye-slash"></i>';
+                }
+            });
+        });
         // Toggle register form
         document.getElementById("go-to-register").addEventListener("click", (e) => {
             e.preventDefault();
@@ -100,6 +113,8 @@ const Auth = {
             // Save credentials
             localStorage.setItem(this.tokenKey, data.access_token);
             localStorage.setItem(this.userKey, data.username);
+            localStorage.setItem("aetheris_is_admin", data.is_admin);
+            localStorage.setItem("aetheris_created_at", data.created_at);
 
             this.showMainApp();
             
@@ -113,12 +128,20 @@ const Auth = {
     logout() {
         localStorage.removeItem(this.tokenKey);
         localStorage.removeItem(this.userKey);
+        localStorage.removeItem("aetheris_is_admin");
+        localStorage.removeItem("aetheris_created_at");
         
         // Reset forms
         document.getElementById("login-username").value = "";
         document.getElementById("login-password").value = "";
         document.getElementById("register-username").value = "";
         document.getElementById("register-password").value = "";
+        
+        // Reset all eye buttons to eye-slash
+        document.querySelectorAll(".btn-toggle-password").forEach(btn => {
+            btn.innerHTML = '<i class="fa-regular fa-eye-slash"></i>';
+            if (btn.previousElementSibling) btn.previousElementSibling.type = "password";
+        });
         
         this.showLoginScreen();
         window.dispatchEvent(new Event("aetheris_logout"));
@@ -139,6 +162,9 @@ const Auth = {
             });
 
             if (response.ok) {
+                const userData = await response.json();
+                localStorage.setItem("aetheris_is_admin", userData.is_admin);
+                localStorage.setItem("aetheris_created_at", userData.created_at);
                 this.showMainApp();
                 window.dispatchEvent(new Event("aetheris_auth_success"));
             } else {

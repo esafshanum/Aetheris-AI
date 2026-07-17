@@ -387,6 +387,34 @@ a:hover {
     box-shadow: 0 0 10px rgba(99, 102, 241, 0.15);
 }
 
+.password-wrapper {
+    position: relative;
+    width: 100%;
+}
+.password-wrapper input {
+    padding-right: 45px !important;
+}
+.btn-toggle-password {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    transition: color var(--transition-fast);
+    z-index: 10;
+}
+.btn-toggle-password:hover {
+    color: var(--accent-primary);
+}
+
 .auth-switch {
     font-size: 0.9rem;
     color: var(--text-secondary);
@@ -1469,4 +1497,47 @@ a:hover {
         padding: 24px 20px;
         margin: 10px;
     }
+}
+
+/* Stealth Admin and User Settings Panels Styles */
+#admin-modal table th {
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.76rem;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid var(--glass-border);
+}
+#admin-modal table td {
+    padding: 12px 15px;
+    border-bottom: 1px solid var(--glass-border);
+    color: var(--text-primary);
+}
+#admin-modal table tr {
+    transition: background-color var(--transition-fast);
+}
+#admin-modal table tr:hover {
+    background-color: rgba(255, 255, 255, 0.02);
+}
+.btn-danger-sm {
+    background-color: rgba(239, 68, 68, 0.12);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #f87171;
+    padding: 5px 10px;
+    border-radius: var(--radius-sm);
+    font-size: 0.78rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+.btn-danger-sm:hover {
+    background-color: #ef4444;
+    color: #ffffff;
+    border-color: #ef4444;
+}
+.avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    overflow: hidden;
 }

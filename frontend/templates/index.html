@@ -29,7 +29,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
     
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="/static/css/styles.css?v=1.3.0">
+    <link rel="stylesheet" href="/static/css/styles.css?v=1.4.0">
 </head>
 <body>
 
@@ -53,7 +53,12 @@
                 </div>
                 <div class="input-group">
                     <label for="login-password"><i class="fa-regular fa-key"></i> Password</label>
-                    <input type="password" id="login-password" name="password" autocomplete="current-password" required placeholder="••••••••">
+                    <div class="password-wrapper">
+                        <input type="password" id="login-password" name="password" autocomplete="current-password" required placeholder="••••••••">
+                        <button type="button" class="btn-toggle-password" tabindex="-1" aria-label="Toggle Password Visibility">
+                            <i class="fa-regular fa-eye-slash"></i>
+                        </button>
+                    </div>
                 </div>
                 <button type="submit" class="btn btn-primary btn-block">
                     <span>Log In</span> <i class="fa-solid fa-right-to-bracket"></i>
@@ -71,7 +76,12 @@
                 </div>
                 <div class="input-group">
                     <label for="register-password"><i class="fa-regular fa-key"></i> Create Password</label>
-                    <input type="password" id="register-password" name="password" autocomplete="new-password" required placeholder="Min 6 characters">
+                    <div class="password-wrapper">
+                        <input type="password" id="register-password" name="password" autocomplete="new-password" required placeholder="Min 6 characters">
+                        <button type="button" class="btn-toggle-password" tabindex="-1" aria-label="Toggle Password Visibility">
+                            <i class="fa-regular fa-eye-slash"></i>
+                        </button>
+                    </div>
                 </div>
                 <button type="submit" class="btn btn-success btn-block">
                     <span>Sign Up</span> <i class="fa-solid fa-user-plus"></i>
@@ -401,11 +411,106 @@
             </div>
         </div>
 
+        <!-- ==================== ACCOUNT DETAILS MODAL ==================== -->
+        <div id="account-modal" class="modal-overlay hidden">
+            <div class="modal-card glass-panel animate-zoom-in" style="max-width: 480px;">
+                <div class="modal-header">
+                    <h3><i class="fa-solid fa-user-gear"></i> Account Profile</h3>
+                    <button id="account-close-btn" class="btn-close-modal"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <div class="modal-body" style="padding: 20px 25px; gap: 20px;">
+                    <div class="user-badge-profile" style="display: flex; align-items: center; gap: 15px; background: rgba(255, 189, 230, 0.08); padding: 15px; border-radius: var(--radius-md); border: 1px solid var(--glass-border);">
+                        <div class="avatar" style="width: 50px; height: 50px; font-size: 1.5rem; background: var(--accent-primary); color: #080b11;">
+                            <i class="fa-solid fa-user-ninja"></i>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 4px;">
+                            <span id="account-username-display" class="username" style="font-weight: 700; font-size: 1.15rem; color: var(--text-primary);">Username</span>
+                            <span id="account-role-display" class="muted-text" style="font-size: 0.82rem;">Role: Regular User</span>
+                            <span id="account-date-display" class="muted-text" style="font-size: 0.78rem;">Member Since: N/A</span>
+                        </div>
+                    </div>
+
+                    <form id="change-password-form" style="display: flex; flex-direction: column; gap: 12px; width: 100%;">
+                        <h4 style="margin-bottom: 5px; font-size: 0.95rem; border-bottom: 1px solid var(--glass-border); padding-bottom: 8px;"><i class="fa-solid fa-lock-open"></i> Change Password</h4>
+                        <div class="input-group">
+                            <label for="change-curr-pass">Current Password</label>
+                            <input type="password" id="change-curr-pass" required placeholder="••••••••" style="font-size: 16px;">
+                        </div>
+                        <div class="input-group">
+                            <label for="change-new-pass">New Password (min 6 characters)</label>
+                            <input type="password" id="change-new-pass" required placeholder="••••••••" style="font-size: 16px;">
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block" style="margin-top: 10px;">
+                            Update Password
+                        </button>
+                    </form>
+
+                    <div id="change-pass-error" class="error-banner hidden" style="width: 100%;">
+                        <i class="fa-solid fa-circle-exclamation"></i> <span id="change-pass-error-msg"></span>
+                    </div>
+                    <div id="change-pass-success" class="success-banner hidden" style="width: 100%; display: flex; align-items: center; gap: 8px; color: var(--success-color); font-size: 0.88rem; background: rgba(16, 185, 129, 0.1); padding: 10px 14px; border-radius: var(--radius-sm); border: 1px solid rgba(16, 185, 129, 0.2);">
+                        <i class="fa-solid fa-circle-check"></i> Password changed successfully.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== STEALTH ADMIN CONSOLE MODAL ==================== -->
+        <div id="admin-modal" class="modal-overlay hidden">
+            <div class="modal-card glass-panel animate-zoom-in" style="max-width: 680px; width: 90%;">
+                <div class="modal-header">
+                    <h3><i class="fa-solid fa-user-shield"></i> Stealth System Administration</h3>
+                    <button id="admin-close-btn" class="btn-close-modal"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <div class="modal-body" style="padding: 20px 25px; gap: 20px; overflow-y: auto;">
+                    <!-- Admin Statistics -->
+                    <div class="admin-stats-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; width: 100%;">
+                        <div class="stat-card" style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--glass-border); padding: 15px; border-radius: var(--radius-md); display: flex; flex-direction: column; gap: 6px;">
+                            <span class="muted-text" style="font-size: 0.8rem; font-weight: 500;">TOTAL REGISTERED USERS</span>
+                            <span id="admin-stat-users" style="font-size: 1.8rem; font-weight: 700; color: var(--accent-primary);">0</span>
+                        </div>
+                        <div class="stat-card" style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--glass-border); padding: 15px; border-radius: var(--radius-md); display: flex; flex-direction: column; gap: 6px;">
+                            <span class="muted-text" style="font-size: 0.8rem; font-weight: 500;">TOTAL CONVERSATIONS</span>
+                            <span id="admin-stat-chats" style="font-size: 1.8rem; font-weight: 700; color: var(--accent-primary);">0</span>
+                        </div>
+                        <div class="stat-card" style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--glass-border); padding: 15px; border-radius: var(--radius-md); display: flex; flex-direction: column; gap: 6px;">
+                            <span class="muted-text" style="font-size: 0.8rem; font-weight: 500;">TOTAL MESSAGES SENT</span>
+                            <span id="admin-stat-messages" style="font-size: 1.8rem; font-weight: 700; color: var(--accent-primary);">0</span>
+                        </div>
+                        <div class="stat-card" style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--glass-border); padding: 15px; border-radius: var(--radius-md); display: flex; flex-direction: column; gap: 6px;">
+                            <span class="muted-text" style="font-size: 0.8rem; font-weight: 500;">TOTAL UPLOADED STORAGE</span>
+                            <span id="admin-stat-storage" style="font-size: 1.8rem; font-weight: 700; color: var(--accent-primary);">0 KB</span>
+                        </div>
+                    </div>
+
+                    <!-- User Account Management Table -->
+                    <div style="display: flex; flex-direction: column; gap: 10px; width: 100%; margin-top: 10px;">
+                        <h4 style="font-size: 0.95rem; font-weight: 600;"><i class="fa-solid fa-users"></i> Registered User Accounts</h4>
+                        <div style="overflow-x: auto; width: 100%; border: 1px solid var(--glass-border); border-radius: var(--radius-md);">
+                            <table style="width: 100%; border-collapse: collapse; font-size: 0.88rem; text-align: left;">
+                                <thead style="background: rgba(255, 255, 255, 0.03); border-bottom: 1px solid var(--glass-border); color: var(--text-secondary);">
+                                    <tr>
+                                        <th style="padding: 10px 15px;">User ID</th>
+                                        <th style="padding: 10px 15px;">Username</th>
+                                        <th style="padding: 10px 15px;">Privilege</th>
+                                        <th style="padding: 10px 15px; text-align: right;">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="admin-user-table-body">
+                                    <!-- Rendered dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <!-- Script triggers -->
-    <script src="/static/js/auth.js?v=1.3.0"></script>
-    <script src="/static/js/voice.js?v=1.3.0"></script>
-    <script src="/static/js/app.js?v=1.3.0"></script>
+    <script src="/static/js/auth.js?v=1.4.0"></script>
+    <script src="/static/js/voice.js?v=1.4.0"></script>
+    <script src="/static/js/app.js?v=1.4.0"></script>
 </body>
 </html>

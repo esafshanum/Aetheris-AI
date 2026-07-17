@@ -6,7 +6,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
 
 from backend.app.database import engine, Base
-from backend.app.routes import auth_routes, chat_routes, document_routes, settings_routes, voice_routes
+from backend.app.routes import auth_routes, chat_routes, document_routes, settings_routes, voice_routes, admin_routes
 from backend.app.utils.security import SecurityUtils
 
 # Create database tables if they do not exist (wrapped in try-except for startup resilience)
@@ -15,6 +15,28 @@ try:
 except Exception as e:
     print(f"CRITICAL: Database initialization failed on startup: {str(e)}")
     print("Continuing server startup in degraded/offline database mode.")
+
+# Seed default admin user
+try:
+    from backend.app.database import SessionLocal
+    from backend.app.models import User
+    from backend.app.auth import get_password_hash
+    db_session = SessionLocal()
+    admin_username = os.environ.get("ADMIN_USERNAME", "aetheris_admin")
+    admin_exists = db_session.query(User).filter(User.username == admin_username).first()
+    if not admin_exists:
+        admin_password = os.environ.get("ADMIN_PASSWORD", "adminPassword123")
+        new_admin = User(
+            username=admin_username,
+            hashed_password=get_password_hash(admin_password),
+            is_admin=True
+        )
+        db_session.add(new_admin)
+        db_session.commit()
+        print(f"Stealth admin user '{admin_username}' seeded successfully.")
+    db_session.close()
+except Exception as seed_err:
+    print(f"Error seeding default admin account: {str(seed_err)}")
 
 app = FastAPI(
     title="AI Chatbot Assistant API",
@@ -74,6 +96,7 @@ app.include_router(chat_routes.router)
 app.include_router(document_routes.router)
 app.include_router(settings_routes.router)
 app.include_router(voice_routes.router)
+app.include_router(admin_routes.router)
 
 # Custom Global Error Handler
 @app.exception_handler(Exception)

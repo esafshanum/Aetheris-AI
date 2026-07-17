@@ -252,13 +252,122 @@ const App = {
             this.handleFileUpload(e.target.files);
         });
 
-        // Clean configure modal close on click outside
+        // Clean configure, account, and admin modal close on click outside
         window.addEventListener("click", (e) => {
             const modal = document.getElementById("settings-modal");
             if (e.target === modal) {
                 modal.classList.add("hidden");
             }
+            const accountModal = document.getElementById("account-modal");
+            if (e.target === accountModal) {
+                accountModal.classList.add("hidden");
+            }
+            const adminModal = document.getElementById("admin-modal");
+            if (e.target === adminModal) {
+                Admin.closePanel();
+            }
         });
+
+        // Account Details Modal triggers (clicking on .user-profile container)
+        const userProfile = document.querySelector(".user-profile");
+        if (userProfile) {
+            userProfile.addEventListener("click", () => {
+                const modal = document.getElementById("account-modal");
+                if (modal) {
+                    const username = localStorage.getItem("aetheris_username") || "User";
+                    const isAdmin = localStorage.getItem("aetheris_is_admin") === "true";
+                    const createdAt = localStorage.getItem("aetheris_created_at");
+                    
+                    document.getElementById("account-username-display").innerText = username;
+                    document.getElementById("account-role-display").innerText = `Role: ${isAdmin ? "Administrator" : "Regular User"}`;
+                    
+                    let dateStr = "N/A";
+                    if (createdAt) {
+                        dateStr = new Date(createdAt).toLocaleDateString(undefined, {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                        });
+                    }
+                    document.getElementById("account-date-display").innerText = `Member Since: ${dateStr}`;
+                    
+                    // Reset fields
+                    document.getElementById("change-curr-pass").value = "";
+                    document.getElementById("change-new-pass").value = "";
+                    document.getElementById("change-pass-error").classList.add("hidden");
+                    document.getElementById("change-pass-success").classList.add("hidden");
+                    
+                    modal.classList.remove("hidden");
+                }
+            });
+        }
+
+        // Close Account Modal
+        const closeAccountBtn = document.getElementById("account-close-btn");
+        if (closeAccountBtn) {
+            closeAccountBtn.addEventListener("click", () => {
+                document.getElementById("account-modal").classList.add("hidden");
+            });
+        }
+
+        // Close Admin Modal
+        const closeAdminBtn = document.getElementById("admin-close-btn");
+        if (closeAdminBtn) {
+            closeAdminBtn.addEventListener("click", () => {
+                Admin.closePanel();
+            });
+        }
+
+        // Submit Change Password Form
+        const changePasswordForm = document.getElementById("change-password-form");
+        if (changePasswordForm) {
+            changePasswordForm.addEventListener("submit", async (e) => {
+                e.preventDefault();
+                const currentPassword = document.getElementById("change-curr-pass").value;
+                const newPassword = document.getElementById("change-new-pass").value;
+                
+                const errBanner = document.getElementById("change-pass-error");
+                const successBanner = document.getElementById("change-pass-success");
+                
+                errBanner.classList.add("hidden");
+                successBanner.classList.add("hidden");
+                
+                if (newPassword.length < 6) {
+                    document.getElementById("change-pass-error-msg").innerText = "New password must be at least 6 characters.";
+                    errBanner.classList.remove("hidden");
+                    return;
+                }
+                
+                try {
+                    const response = await fetch("/api/auth/change-password", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${Auth.getToken()}`
+                        },
+                        body: JSON.stringify({
+                            current_password: currentPassword,
+                            new_password: newPassword
+                        })
+                    });
+                    
+                    const data = await response.json();
+                    if (!response.ok) {
+                        throw new Error(data.detail || "Failed to update password.");
+                    }
+                    
+                    successBanner.classList.remove("hidden");
+                    document.getElementById("change-curr-pass").value = "";
+                    document.getElementById("change-new-pass").value = "";
+                    setTimeout(() => {
+                        document.getElementById("account-modal").classList.add("hidden");
+                    }, 1500);
+                } catch (err) {
+                    document.getElementById("change-pass-error-msg").innerText = err.message;
+                    errBanner.classList.remove("hidden");
+                }
+            });
+        }
     },
 
     // --- LIFE CYCLE CALLBACKS ---
@@ -267,12 +376,38 @@ const App = {
         this.checkServerApiKey();
         this.loadSessionsList();
         this.showLandingWelcome();
+        this.setupStealthAdmin();
+    },
+
+    setupStealthAdmin() {
+        if (localStorage.getItem("aetheris_is_admin") === "true") {
+            const brandLogo = document.querySelector(".sidebar-header .brand");
+            if (brandLogo) {
+                brandLogo.style.cursor = "pointer";
+                brandLogo.removeEventListener("dblclick", this._onAdminDblClick);
+                this._onAdminDblClick = () => {
+                    Admin.openPanel();
+                };
+                brandLogo.addEventListener("dblclick", this._onAdminDblClick);
+            }
+        }
     },
 
     onLogout() {
         this.activeSessionId = null;
         this.stopSpeaking();
         this.showLandingWelcome();
+        
+        // Hide modals
+        document.getElementById("account-modal").classList.add("hidden");
+        Admin.closePanel();
+        
+        // Reset logo state
+        const brandLogo = document.querySelector(".sidebar-header .brand");
+        if (brandLogo) {
+            brandLogo.style.cursor = "";
+            brandLogo.removeEventListener("dblclick", this._onAdminDblClick);
+        }
     },
 
     // --- CHAT SESSION CRUD ---
@@ -1191,6 +1326,136 @@ function SecurityUtils_escapeHtml(text) {
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
 }
+
+// --- STEALTH ADMIN MODULE ---
+
+const Admin = {
+    modalId: "admin-modal",
+    
+    async openPanel() {
+        const modal = document.getElementById(this.modalId);
+        if (!modal) return;
+        
+        modal.classList.remove("hidden");
+        await this.loadStats();
+        await this.loadUsers();
+    },
+    
+    closePanel() {
+        const modal = document.getElementById(this.modalId);
+        if (modal) modal.classList.add("hidden");
+    },
+    
+    async loadStats() {
+        try {
+            const response = await fetch("/api/admin/stats", {
+                headers: { "Authorization": `Bearer ${Auth.getToken()}` }
+            });
+            if (!response.ok) throw new Error("Failed to fetch admin stats.");
+            const data = await response.json();
+            
+            document.getElementById("admin-stat-users").innerText = data.total_users;
+            document.getElementById("admin-stat-chats").innerText = data.total_sessions;
+            document.getElementById("admin-stat-messages").innerText = data.total_messages;
+            
+            const sizeBytes = data.total_files_size_bytes;
+            let formattedSize = "0 KB";
+            if (sizeBytes >= 1024 * 1024) {
+                formattedSize = (sizeBytes / (1024 * 1024)).toFixed(2) + " MB";
+            } else if (sizeBytes >= 1024) {
+                formattedSize = (sizeBytes / 1024).toFixed(2) + " KB";
+            } else if (sizeBytes > 0) {
+                formattedSize = sizeBytes + " Bytes";
+            }
+            document.getElementById("admin-stat-storage").innerText = `${formattedSize} (${data.total_files_count} files)`;
+        } catch (err) {
+            console.error("Admin stats fetch error:", err);
+        }
+    },
+    
+    async loadUsers() {
+        const tbody = document.getElementById("admin-user-table-body");
+        if (!tbody) return;
+        
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:20px;color:var(--text-secondary);">Loading registered users...</td></tr>';
+        
+        try {
+            const response = await fetch("/api/admin/users", {
+                headers: { "Authorization": `Bearer ${Auth.getToken()}` }
+            });
+            if (!response.ok) throw new Error("Failed to fetch user list.");
+            const users = await response.json();
+            
+            tbody.innerHTML = "";
+            if (users.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:20px;color:var(--text-secondary);">No user accounts found.</td></tr>';
+                return;
+            }
+            
+            const currentUsername = Auth.getUsername();
+            users.forEach(u => {
+                const tr = document.createElement("tr");
+                const dateStr = new Date(u.created_at).toLocaleDateString(undefined, {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                });
+                
+                const isSelf = u.username === currentUsername;
+                const deleteBtn = isSelf 
+                    ? '<span class="muted-text" style="font-size:0.8rem;padding-right:10px;">(You)</span>' 
+                    : `<button class="btn-danger-sm" onclick="Admin.deleteUser(${u.id}, '${u.username}')"><i class="fa-solid fa-user-minus"></i> Delete</button>`;
+                
+                tr.innerHTML = `
+                    <td style="padding: 10px 15px; color: var(--text-secondary); font-family: monospace;">#${u.id}</td>
+                    <td style="padding: 10px 15px; font-weight: 500;">
+                        ${u.username}
+                        <div style="font-size:0.75rem; color:var(--text-secondary); margin-top:2px;">Joined: ${dateStr}</div>
+                    </td>
+                    <td style="padding: 10px 15px;">
+                        <span style="font-size:0.76rem; padding: 3px 8px; border-radius: 20px; font-weight: 600;
+                              background: ${u.is_admin ? 'rgba(255,189,230,0.15)' : 'rgba(255,255,255,0.03)'};
+                              color: ${u.is_admin ? 'var(--accent-primary)' : 'var(--text-secondary)'};
+                              border: 1px solid ${u.is_admin ? 'rgba(255,189,230,0.3)' : 'var(--glass-border)'};">
+                            ${u.is_admin ? 'Administrator' : 'Regular User'}
+                        </span>
+                    </td>
+                    <td style="padding: 10px 15px; text-align: right;">
+                        ${deleteBtn}
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        } catch (err) {
+            console.error("Admin user list fetch error:", err);
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:20px;color:var(--error-color);"><i class="fa-solid fa-circle-exclamation"></i> Error loading user list.</td></tr>';
+        }
+    },
+    
+    async deleteUser(userId, username) {
+        if (!confirm(`Are you absolutely sure you want to delete the user account "${username}"?\nThis will permanently delete all of their conversations, uploaded documents, and database records!`)) {
+            return;
+        }
+        
+        try {
+            const response = await fetch(`/api/admin/users/${userId}`, {
+                method: "DELETE",
+                headers: { "Authorization": `Bearer ${Auth.getToken()}` }
+            });
+            if (!response.ok) {
+                const data = await response.json();
+                throw new Error(data.detail || "Delete operation failed.");
+            }
+            
+            await this.loadStats();
+            await this.loadUsers();
+        } catch (err) {
+            alert(`Error deleting user: ${err.message}`);
+        }
+    }
+};
+
+window.Admin = Admin;
 
 document.addEventListener("DOMContentLoaded", () => {
     App.init();
