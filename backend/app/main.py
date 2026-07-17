@@ -22,7 +22,7 @@ try:
     from backend.app.models import User
     from backend.app.auth import get_password_hash
     db_session = SessionLocal()
-    admin_username = os.environ.get("ADMIN_USERNAME", "Shanum")
+    admin_username = os.environ.get("ADMIN_USERNAME", "Shanumer@admin1204")
     admin_exists = db_session.query(User).filter(User.username == admin_username).first()
     if not admin_exists:
         admin_password = os.environ.get("ADMIN_PASSWORD", "Shanum@Aetheris#2026")
