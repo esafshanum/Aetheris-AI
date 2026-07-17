@@ -1434,7 +1434,7 @@ a:hover {
 
     /* Input controls scaling to prevent keybard overlays & scrolling */
     .input-panel {
-        padding: 0 12px 12px 12px;
+        padding: 0 12px calc(16px + env(safe-area-inset-bottom, 12px)) 12px;
     }
     .input-container {
         padding: 6px 8px;
@@ -1474,9 +1474,7 @@ a:hover {
         font-size: 0.82rem;
     }
     .features-grid {
-        grid-template-columns: 1fr;
-        gap: 10px;
-        margin-top: 15px;
+        display: none !important;
     }
     .feature-card {
         padding: 15px 12px;
