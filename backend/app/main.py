@@ -9,8 +9,12 @@ from backend.app.database import engine, Base
 from backend.app.routes import auth_routes, chat_routes, document_routes, settings_routes, voice_routes
 from backend.app.utils.security import SecurityUtils
 
-# Create SQLite database tables if they do not exist
-Base.metadata.create_all(bind=engine)
+# Create database tables if they do not exist (wrapped in try-except for startup resilience)
+try:
+    Base.metadata.create_all(bind=engine)
+except Exception as e:
+    print(f"CRITICAL: Database initialization failed on startup: {str(e)}")
+    print("Continuing server startup in degraded/offline database mode.")
 
 app = FastAPI(
     title="AI Chatbot Assistant API",
@@ -57,6 +61,12 @@ templates = Jinja2Templates(directory="frontend/templates")
 @app.get("/", response_class=HTMLResponse)
 def serve_spa(request: Request):
     return templates.TemplateResponse(request=request, name="index.html")
+
+# Keep-alive status endpoint
+@app.get("/api/ping")
+def ping():
+    from datetime import datetime
+    return {"status": "healthy", "timestamp": datetime.utcnow().isoformat()}
 
 # Register Backend Routers
 app.include_router(auth_routes.router)
