@@ -1373,6 +1373,8 @@ a:hover {
         transform: translateX(-100%);
         box-shadow: 5px 0 25px rgba(0, 0, 0, 0.4);
         z-index: 1000;
+        margin-right: -290px; /* Offset width to prevent browser flex shifting */
+        transition: transform var(--transition-normal);
     }
     .app-sidebar.active {
         transform: translateX(0);
