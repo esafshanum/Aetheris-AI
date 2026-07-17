@@ -207,10 +207,18 @@ const App = {
 
         // Chat text area auto growth
         const textarea = document.getElementById("chat-textarea");
-        textarea.addEventListener("input", function() {
-            this.style.height = "auto";
-            this.style.height = (this.scrollHeight - 4) + "px";
-        });
+        const adjustTextareaHeight = () => {
+            if (!textarea) return;
+            textarea.style.height = "auto";
+            const newHeight = Math.max(24, textarea.scrollHeight - 4);
+            textarea.style.height = newHeight + "px";
+        };
+        textarea.addEventListener("input", adjustTextareaHeight);
+        window.addEventListener("resize", adjustTextareaHeight);
+        
+        // Prevent placeholder cutoffs by executing height checks on initial load
+        setTimeout(adjustTextareaHeight, 150);
+        setTimeout(adjustTextareaHeight, 600);
 
         // Reset scroll when input loses focus (fixes keyboard layout shifts in iOS Safari)
         textarea.addEventListener("blur", () => {
@@ -385,6 +393,15 @@ const App = {
         this.loadSessionsList();
         this.showLandingWelcome();
         this.setupStealthAdmin();
+        
+        // Adjust height on login success to ensure placeholder is visible
+        setTimeout(() => {
+            const textarea = document.getElementById("chat-textarea");
+            if (textarea) {
+                textarea.style.height = "auto";
+                textarea.style.height = Math.max(24, textarea.scrollHeight - 4) + "px";
+            }
+        }, 200);
     },
 
     setupStealthAdmin() {

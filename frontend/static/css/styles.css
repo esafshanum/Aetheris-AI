@@ -1127,6 +1127,7 @@ a:hover {
     max-height: 200px;
     padding: 10px 6px;
     line-height: 1.4;
+    height: 24px;
 }
 .input-container textarea:focus {
     outline: none;
@@ -1445,6 +1446,7 @@ a:hover {
         font-size: 16px;
         padding: 6px 4px;
         max-height: 100px;
+        height: 24px;
     }
     .btn-send {
         width: 34px;
@@ -1474,10 +1476,29 @@ a:hover {
         font-size: 0.82rem;
     }
     .features-grid {
-        display: none !important;
+        display: flex !important;
+        flex-direction: row;
+        overflow-x: auto;
+        gap: 12px;
+        width: 100%;
+        padding: 5px 0 15px 0;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        margin-top: 15px;
+    }
+    .features-grid::-webkit-scrollbar {
+        display: none;
     }
     .feature-card {
-        padding: 15px 12px;
+        flex: 0 0 240px;
+        scroll-snap-align: start;
+        padding: 12px;
+        gap: 6px;
+        text-align: left;
+        align-items: flex-start;
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid var(--glass-border);
+        border-radius: var(--radius-md);
     }
 
     /* Overlays modals scaling */
