@@ -1483,29 +1483,25 @@ a:hover {
         font-size: 0.82rem;
     }
     .features-grid {
-        display: flex !important;
-        flex-direction: row;
-        overflow-x: auto;
+        display: grid !important;
+        grid-template-columns: 1fr;
         gap: 12px;
-        width: 100%;
-        padding: 5px 0 15px 0;
-        scroll-snap-type: x mandatory;
-        -webkit-overflow-scrolling: touch;
         margin-top: 15px;
-    }
-    .features-grid::-webkit-scrollbar {
-        display: none;
+        width: 100%;
     }
     .feature-card {
-        flex: 0 0 240px;
-        scroll-snap-align: start;
-        padding: 12px;
-        gap: 6px;
-        text-align: left;
-        align-items: flex-start;
+        padding: 18px 15px;
+        border-radius: var(--radius-lg);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        text-align: center;
         background: rgba(255, 255, 255, 0.02);
         border: 1px solid var(--glass-border);
-        border-radius: var(--radius-md);
+    }
+    .feature-card p {
+        font-size: 0.78rem;
     }
 
     /* Overlays modals scaling */
