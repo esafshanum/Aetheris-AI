@@ -310,6 +310,14 @@ const App = {
             });
         }
 
+        // Account Details Modal Sign Out Button
+        const accountLogoutBtn = document.getElementById("account-logout-btn");
+        if (accountLogoutBtn) {
+            accountLogoutBtn.addEventListener("click", () => {
+                Auth.logout();
+            });
+        }
+
         // Close Admin Modal
         const closeAdminBtn = document.getElementById("admin-close-btn");
         if (closeAdminBtn) {
