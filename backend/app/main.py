@@ -71,11 +71,16 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Enable CORS (Cross-Origin Resource Sharing)
+# Enable CORS (Cross-Origin Resource Sharing) with production-ready origins
+allowed_origins = ["*"]
+origins_env = os.environ.get("CORS_ALLOWED_ORIGINS", "")
+if origins_env:
+    allowed_origins = [o.strip() for o in origins_env.split(",") if o.strip()]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # Allow all origins for local execution
-    allow_credentials=True,
+    allow_origins=allowed_origins,
+    allow_credentials=True if allowed_origins != ["*"] else False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -96,22 +101,32 @@ async def rate_limit_middleware(request: Request, call_next):
     response = await call_next(request)
     return response
 
-# Ensure static directories and template folders exist
+# Ensure static directories exist
 os.makedirs("frontend/static", exist_ok=True)
-os.makedirs("frontend/templates", exist_ok=True)
 
 # Serve Static Files
 app.mount("/static", StaticFiles(directory="frontend/static"), name="static")
 
-# Templates setup
-templates = Jinja2Templates(directory="frontend/templates")
+# Serve dynamic config.js locally
+from fastapi.responses import FileResponse
+@app.get("/config.js")
+def get_config_js():
+    return FileResponse("frontend/config.js")
+
+# Templates setup (serve SPA from frontend root)
+templates = Jinja2Templates(directory="frontend")
 
 # Frontend routes (serve Single Page Application)
 @app.get("/", response_class=HTMLResponse)
 def serve_spa(request: Request):
     return templates.TemplateResponse(request=request, name="index.html")
 
-# Keep-alive status endpoint
+# Health Check & Ping endpoints
+@app.get("/health")
+def health_check():
+    from datetime import datetime
+    return {"status": "healthy", "timestamp": datetime.utcnow().isoformat(), "environment": "production"}
+
 @app.get("/api/ping")
 def ping():
     from datetime import datetime

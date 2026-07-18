@@ -12,6 +12,13 @@ class Settings(BaseSettings):
     UPLOAD_DIR: str = "./uploads"
     VECTOR_STORE_DIR: str = "./vectorstore"
 
+    # Production & Supabase specific configs
+    GEMINI_API_KEY: str = ""
+    SECRET_KEY: str = ""
+    SUPABASE_URL: str = ""
+    SUPABASE_KEY: str = ""
+    SUPABASE_SERVICE_ROLE_KEY: str = ""
+
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"
