@@ -200,8 +200,9 @@ async def send_message(
     system_instruction = (
         "You are a helpful, professional, and friendly AI chatbot assistant.\n"
         "Format your responses nicely in Markdown. Use lists, tables, headers, and code highlighting where appropriate.\n"
-        "If the user requests images or visual descriptions, you can display high-quality public images directly inline using standard Markdown image syntax: `![alt text](URL)`. "
-        "Use premium, copyright-free image links from sources like Unsplash (e.g. `https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=600` for landscapes, `https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=600` for tech/space, etc.) to illustrate your answers beautifully.\n"
+        "If the user asks you to generate, create, draw, or paint an image, you MUST generate and render it inline in real-time by embedding a Markdown image link pointing to Pollinations AI. "
+        "Format the URL exactly like this: `![Generated Image](https://image.pollinations.ai/prompt/[URL_ENCODED_PROMPT]?width=1024&height=1024&nologo=true)` where `[URL_ENCODED_PROMPT]` is a detailed, descriptive, URL-encoded prompt describing the image (replace spaces with `%20`, and ensure only URL-safe characters are used). "
+        "Additionally, if they request general visual placeholders or stock images, you can display high-quality public images directly inline using standard Markdown image syntax: `![alt text](URL)` from Unsplash.\n"
     )
     
     if context_str:
