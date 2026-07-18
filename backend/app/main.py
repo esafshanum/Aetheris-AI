@@ -148,3 +148,14 @@ async def global_exception_handler(request: Request, exc: Exception):
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         content={"detail": "An unexpected server error occurred. Please contact the administrator."}
     )
+
+if __name__ == "__main__":
+    import uvicorn
+    import os
+    port_env = os.environ.get("PORT", "8000")
+    try:
+        port = int(port_env)
+    except ValueError:
+        # Fallback if port_env contains literal '$PORT' or invalid string
+        port = 8000
+    uvicorn.run("backend.app.main:app", host="0.0.0.0", port=port)

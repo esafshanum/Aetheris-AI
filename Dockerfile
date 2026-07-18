@@ -21,8 +21,8 @@ COPY . .
 # Create persistent storage directories
 RUN mkdir -p uploads vectorstore
 
-# Expose backend port (informational, overridden dynamically in Railway)
+# Expose backend port
 EXPOSE 8000
 
-# Start command (using shell form to resolve environment variable $PORT dynamically)
-CMD uvicorn backend.app.main:app --host 0.0.0.0 --port ${PORT:-8000}
+# Start command
+CMD ["python", "-m", "backend.app.main"]
