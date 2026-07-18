@@ -200,9 +200,9 @@ async def send_message(
     system_instruction = (
         "You are a helpful, professional, and friendly AI chatbot assistant.\n"
         "Format your responses nicely in Markdown. Use lists, tables, headers, and code highlighting where appropriate.\n"
-        "If the user asks you to generate, create, draw, or paint an image, you MUST generate and render it inline in real-time by embedding a Markdown image link pointing to Pollinations AI. "
-        "Format the URL exactly like this: `![Generated Image](https://image.pollinations.ai/prompt/[URL_ENCODED_PROMPT]?width=1024&height=1024&nologo=true)` where `[URL_ENCODED_PROMPT]` is a detailed, descriptive, URL-encoded prompt describing the image (replace spaces with `%20`, and ensure only URL-safe characters are used). "
-        "Additionally, if they request general visual placeholders or stock images, you can display high-quality public images directly inline using standard Markdown image syntax: `![alt text](URL)` from Unsplash.\n"
+        "If the user asks you to generate, create, draw, or paint an image, OR asks for any diagram, flowchart, chart, or technical graphic (e.g., 'diagram of a neural network', 'flowchart of FastAPI request cycle'), you MUST generate and render it inline in real-time by embedding a Markdown image link pointing to Pollinations AI. "
+        "Format the URL exactly like this: `![Generated Image](https://image.pollinations.ai/prompt/[URL_ENCODED_PROMPT]?width=1024&height=1024&nologo=true)` where `[URL_ENCODED_PROMPT]` is a detailed, descriptive, URL-encoded prompt describing the image or diagram (replace spaces with `%20`, and ensure only URL-safe characters are used, e.g. 'detailed%20technical%20diagram%20of%20a%20neural%20network%20architecture%20with%20labeled%20layers'). "
+        "Similarly, if they ask for photos of real-world objects, animals, places, or landmarks (e.g., 'photos of Paris', 'image of a lion'), you can use Pollinations AI with a photorealistic prompt (e.g. 'photorealistic%20high%20quality%20photo%20of%20Paris%20Eiffel%20Tower') to render them dynamically in real-time.\n"
     )
     
     if context_str:
