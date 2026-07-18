@@ -1051,9 +1051,8 @@ const App = {
                                 const data = JSON.parse(payload);
                                 if (data.content) {
                                     fullContent += data.content;
-                                    // Parse Markdown on the fly
+                                    // Parse Markdown on the fly (highlighting is deferred to stream end for raw speed)
                                     bubble.innerHTML = marked.parse(fullContent);
-                                    this.highlightCodeBlocks(bubble);
                                     this.scrollToBottom();
                                 } else if (data.error) {
                                     streamError = data.error;

@@ -73,7 +73,7 @@ class LLMService:
             if model in ["gpt-4o", "gpt-4-turbo"]:
                 model = "llama-3.3-70b-versatile"
             elif model == "gpt-3.5-turbo":
-                model = "llama3-8b-8192"
+                model = "llama-3.1-8b-instant"
 
         try:
             # Call completion stream (both OpenAI and Groq share standard API structure)
@@ -112,7 +112,7 @@ class LLMService:
         api_key = user_key or settings.OPENAI_API_KEY or settings.GROQ_API_KEY
         model = "gpt-3.5-turbo"
         if api_key and api_key.strip().startswith("gsk_"):
-            model = "llama3-8b-8192"
+            model = "llama-3.1-8b-instant"
 
         try:
             prompt = (
