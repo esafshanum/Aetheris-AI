@@ -15,6 +15,7 @@ if db_url.startswith("postgres://") or db_url.startswith("postgresql://"):
         
         # Self-healing: if host is direct db.xxx.supabase.co (IPv6), rewrite to pooler host (IPv4)
         # db.hkiqwefjeugeukxnngal.supabase.co -> aws-0-ap-southeast-1.pooler.supabase.com:6543
+        project_id = None
         if "supabase.co" in host_part and not "pooler.supabase.co" in host_part:
             host_clean = host_part.split(":")[0].split("/")[0]
             if host_clean.startswith("db."):
@@ -27,6 +28,9 @@ if db_url.startswith("postgres://") or db_url.startswith("postgresql://"):
         
         if ":" in credentials:
             user, password = credentials.split(":", 1)
+            # If username doesn't contain project ID tenant suffix for Supabase connection pooler, append it
+            if project_id and not ("." in user or project_id in user):
+                user = f"{user}.{project_id}"
             # URL encode username and password to prevent connection parsing errors
             user_encoded = urllib.parse.quote_plus(user)
             password_encoded = urllib.parse.quote_plus(password)
