@@ -8,4 +8,4 @@ startCommand = "python -m backend.app.main"
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 5
 healthcheckPath = "/health"
-healthcheckTimeout = 10
+healthcheckTimeout = 120
