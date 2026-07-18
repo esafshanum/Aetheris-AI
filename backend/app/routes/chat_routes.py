@@ -1,9 +1,34 @@
 import json
+import re
+import urllib.parse
+import httpx
 from datetime import datetime
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status, Header, Response
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
+
+async def web_search(query: str) -> str:
+    try:
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        }
+        async with httpx.AsyncClient(headers=headers, timeout=3.0) as client:
+            encoded_query = urllib.parse.quote(query)
+            response = await client.get(f"https://html.duckduckgo.com/html/?q={encoded_query}")
+            if response.status_code == 200:
+                html = response.text
+                snippets = re.findall(r'class="result__snippet"[^>]*>(.*?)<\/a>', html, re.DOTALL)
+                results = []
+                for s in snippets[:3]:
+                    clean = re.sub(r'<[^>]*>', '', s)
+                    clean = clean.replace("&quot;", '"').replace("&amp;", "&").replace("&#x27;", "'").replace("&lt;", "<").replace("&gt;", ">")
+                    results.append(clean.strip())
+                if results:
+                    return "\n".join(results)
+    except Exception as e:
+        print(f"Error performing web search: {str(e)}")
+    return ""
 
 from backend.app.database import get_db, SessionLocal
 from backend.app.models import User, ChatSession, Message, Document
@@ -189,6 +214,16 @@ async def send_message(
                 context_blocks.append(f"[Source: {c['source']} (Chunk #{c['chunk_index']})]\n{c['text']}")
             context_str = "\n\n".join(context_blocks)
 
+    # 2.5. Perform Web Search Fallback for real-time/factual questions
+    search_context = ""
+    search_keywords = ["where", "who", "what", "how", "news", "recent", "weather", "score", "price", "latest", "release", "movie", "show", "watch", "time", "date"]
+    query_lower = sanitized_content.lower()
+    if any(k in query_lower for k in search_keywords):
+        try:
+            search_context = await web_search(sanitized_content)
+        except Exception:
+            pass
+
     # 3. Compile Recent Chat History (e.g., last 10 messages)
     history_messages = db.query(Message)\
         .filter(Message.session_id == session_id)\
@@ -204,6 +239,15 @@ async def send_message(
         "1. **AI Image Generation (ChatGPT-style)**: If the user explicitly asks to 'generate', 'create', 'draw', 'paint', or 'make' a new image, diagram, flowchart, or concept, you MUST embed a Markdown image pointing to Pollinations AI: `![Generated Image](https://image.pollinations.ai/prompt/[URL_ENCODED_PROMPT]?width=768&height=768&nologo=true&model=turbo)` where `[URL_ENCODED_PROMPT]` is a detailed description (replace spaces with `%20`).\n"
         "2. **Real-world Photo Fetching (Google/Flickr-style)**: If the user asks to 'show photos of', 'search images of', or 'fetch images of' real-world food, objects, places, animals, or landmarks (e.g., 'image of tiramisu', 'photo of Eiffel Tower'), you MUST embed a Markdown image pointing to Lorem Flickr: `![Photo of [QUERY]](https://loremflickr.com/800/600/[URL_ENCODED_QUERY])` where `[URL_ENCODED_QUERY]` is the search term (replace spaces with `%20`). This fetches a real high-quality photo of the subject dynamically.\n"
     )
+    
+    if search_context:
+        system_instruction += (
+            "\n[CRITICAL WEB SEARCH CONTEXT]\n"
+            "Below are snippets from the web answering the user's real-time query. "
+            "Use this context to formulate a highly accurate, fresh, and direct response. "
+            "Do not mention that you searched the web or obtained search snippets unless asked.\n\n"
+            f"{search_context}\n"
+        )
     
     if context_str:
         system_instruction += (
