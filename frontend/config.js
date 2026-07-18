@@ -1,6 +1,6 @@
 // Aetheris dynamic production backend configuration
 // When deploying to production, replace empty string with your Railway deployment URL (e.g. "https://chatbot-production.up.railway.app")
-window.API_BASE_URL = "";
+window.API_BASE_URL = "https://web-production-019d6.up.railway.app";
 
 // Dynamic fetch interceptor to prepend backend URL automatically for all backend API routes
 (function() {
