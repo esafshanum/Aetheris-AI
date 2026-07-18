@@ -42,12 +42,22 @@ if db_url.startswith("postgres://") or db_url.startswith("postgresql://"):
 
 # For SQLite, we require connect_args={"check_same_thread": False}
 connect_args = {}
+pool_kwargs = {}
 if db_url.startswith("sqlite"):
     connect_args = {"check_same_thread": False}
+else:
+    # High-performance connection pooling to minimize round-trip latencies
+    pool_kwargs = {
+        "pool_size": 20,
+        "max_overflow": 10,
+        "pool_recycle": 300,
+        "pool_pre_ping": True
+    }
 
 engine = create_engine(
     db_url,
-    connect_args=connect_args
+    connect_args=connect_args,
+    **pool_kwargs
 )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
